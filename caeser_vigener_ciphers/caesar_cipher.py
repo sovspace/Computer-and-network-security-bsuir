@@ -1,36 +1,30 @@
-from alphabet import Alphabet
-from utils import get_letter_alphabet_position
 
 
 class CaesarCipher:
-    @staticmethod
-    def _encrypt_letter(letter: str, key: int, alphabet: Alphabet) -> str:
-        letter_alphabet_position = get_letter_alphabet_position(letter, alphabet)
-        if letter.isupper():
-            return chr((letter_alphabet_position + key) % alphabet.size + ord(alphabet.upper_first_letter))
-        else:
-            return chr((letter_alphabet_position + key) % alphabet.size + ord(alphabet.lower_first_letter))
+    CHARS_AMOUNT_IN_BYTE = 256
 
     @staticmethod
-    def encrypt(message: str, key: int, alphabet: Alphabet) -> str:
-        result_message_letters = []
-        for letter in message:
-            encrypted_letter = CaesarCipher._encrypt_letter(letter, key, alphabet)
-            result_message_letters.append(encrypted_letter)
-        return ''.join(result_message_letters)
+    def _encrypt_byte(byte: bytes, key: int) -> int:
+        return (ord(byte) + key) % CaesarCipher.CHARS_AMOUNT_IN_BYTE
 
     @staticmethod
-    def _decrypt_letter(letter: str, key: int, alphabet: Alphabet) -> str:
-        letter_alphabet_position = get_letter_alphabet_position(letter, alphabet)
-        if letter.isupper():
-            return chr((letter_alphabet_position - key) % alphabet.size + ord(alphabet.upper_first_letter))
-        else:
-            return chr((letter_alphabet_position - key) % alphabet.size + ord(alphabet.lower_first_letter))
+    def encrypt_file(filename: str, key: int) -> bytes:
+        with open(filename, 'rb') as file:
+            bytes_list = []
+            while byte := file.read(1):
+                encrypted_byte = CaesarCipher._encrypt_byte(byte, key)
+                bytes_list.append(encrypted_byte)
+        return bytes(bytes_list)
 
     @staticmethod
-    def decrypt(message: str, key: int, alphabet: Alphabet) -> str:
-        result_message_letters = []
-        for letter in message:
-            decrypted_letter = CaesarCipher._decrypt_letter(letter, key, alphabet)
-            result_message_letters.append(decrypted_letter)
-        return ''.join(result_message_letters)
+    def _decrypt_byte(byte: bytes, key: int) -> int:
+        return (ord(byte) - key) % CaesarCipher.CHARS_AMOUNT_IN_BYTE
+
+    @staticmethod
+    def decrypt_file(filename: str, key: int) -> bytes:
+        with open(filename, 'rb') as file:
+            bytes_list = []
+            while byte := file.read(1):
+                decrypted_byte = CaesarCipher._decrypt_byte(byte, key)
+                bytes_list.append(decrypted_byte)
+        return bytes(bytes_list)
